@@ -1,0 +1,80 @@
+doctype html
+html(lang='ru')
+head
+    title Chat
+    link(href='/css/chat.css?5646', rel='stylesheet')
+    script(src='https://code.jquery.com/jquery-1.11.1.js')
+    link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css', integrity='sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ', crossorigin='anonymous')
+.container
+
+    if error
+
+        p #{error}
+        p Авторизация
+            form(name='login', action='/login', method='post')
+                .form-group
+                    .input-group.margin-bottom-sm
+                        span.input-group-addon
+                            i.fa.fa-user-circle-o.fa-fw(aria-hidden='true')
+                        input.form-control(type='text', placeholder='e-mail', name='email')
+                .form-group
+                    .input-group.margin-bottom-sm
+                        span.input-group-addon
+                            i.fa.fa-user-circle-o.fa-fw(aria-hidden='true')
+                        input.form-control(type="password", placeholder='Password', name='password')
+                .form-group
+                button.btn-primary.btn(type='submit') Вход
+        p Регистрация
+            form(name='login', action='/register', method='post')
+                .form-group
+                    .input-group.margin-bottom-sm
+                        span.input-group-addon
+                            i.fa.fa-user-circle-o.fa-fw(aria-hidden='true')
+                        input.form-control(type='text', placeholder='e-mail', name='email')
+                .form-group
+                    .input-group.margin-bottom-sm
+                        span.input-group-addon
+                            i.fa.fa-user-circle-o.fa-fw(aria-hidden='true')
+                        input.form-control(type="password", placeholder='Password', name='password')
+                .form-group
+                button.btn-primary.btn(type='submit') Регистрация
+    else
+        if user
+
+            p Рады вас видеть #{user}
+
+
+                form#logout(action='')
+                    button.btn Выйти
+
+
+        ul#messages
+            if messenge
+                each item in messenge
+                    li #{item}
+
+        .mess
+            form.mess#content(action='')
+                input.messinput#m(autocomplete='off')
+                button.messbutton Отправить
+        script(src='https://cdn.socket.io/socket.io-1.2.0.js')
+
+        script.
+            $(function () {
+                var socket = io();
+                $('#content').submit(function(){
+                    socket.emit('chat message', $('#m').val());
+                    $('#m').val('');
+                    return false;
+                });
+                socket.on('chat message', function(msg){
+                    $('#messages').append($('<li>').text(msg));
+                    window.scrollTo(0, document.body.scrollHeight);
+                });
+                $('#logout').submit(function(){
+                    $.ajax({
+                        url: 'logout',
+                        method: 'POST'
+                    });
+                })
+            });
